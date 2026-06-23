@@ -9,7 +9,7 @@ st.title("🔐 Password Generator")
 st.write("Generate strong, random passwords with configurable options.")
 
 st.sidebar.header("Password Settings")
-length = st.sidebar.slider("Length", min_value=6, max_value=64, value=16, step=1)
+length = st.sidebar.slider("Length", min_value=4, max_value=64, value=8, step=1)
 
 use_lower = st.sidebar.checkbox("Lowercase (a-z)", value=True)
 use_upper = st.sidebar.checkbox("Uppercase (A-Z)", value=True)
