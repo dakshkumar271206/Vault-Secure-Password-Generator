@@ -1,5 +1,5 @@
 import streamlit as st
-import random
+import secrets
 import string
 
 st.set_page_config(page_title="Password Generator", page_icon="🔐", layout="centered")
@@ -40,13 +40,13 @@ if not char_pools:
 
 def generate_password(n: int) -> str:
     # Ensure at least one from each selected pool
-    password_chars = [random.choice(pool) for pool in char_pools]
+    password_chars = [secrets.choice(pool) for pool in char_pools]
     remaining = n - len(password_chars)
 
     if remaining > 0:
-        password_chars.extend(random.choice("".join(char_pools)) for _ in range(remaining))
+        password_chars.extend(secrets.choice("".join(char_pools)) for _ in range(remaining))
 
-    random.shuffle(password_chars)
+    secrets.SystemRandom().shuffle(password_chars)
     return "".join(password_chars)
 
 
