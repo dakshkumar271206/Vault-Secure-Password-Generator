@@ -5,8 +5,8 @@ import math
 import os
 import time
 import requests
-from streamlit_lottie import st_lottie
 import json
+from streamlit_lottie import st_lottie
 
 
 # --- Helper Functions ---
@@ -26,7 +26,20 @@ def load_lottieurl(url: str):
         if r.status_code != 200:
             return None
         return r.json()
-    except:
+    except Exception:
+        return None
+
+def load_lottie_file(filepath: str):
+    """Safely loads a local Lottie JSON file."""
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, filepath)
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
+    except json.JSONDecodeError:
+        # Catches the error if the file exists but is empty or invalid
         return None
 
 def calculate_entropy(length: int, pool_size: int) -> float:
@@ -39,10 +52,16 @@ def calculate_entropy(length: int, pool_size: int) -> float:
 st.set_page_config(page_title="Vault | Secure Generator", page_icon="🔐", layout="centered")
 load_css("style.css")
 
-# --- Load Animations ---
-# We use reliable public URLs so you don't have to download JSON files manually
-lottie_lock = load_lottieurl("https://lottie.host/5a092c45-24e5-4224-b52e-ec5f97f75355/1oY7x44P9T.json")
-lottie_success = load_lottieurl("https://lottie.host/808df04e-e47e-4dcb-947b-1d70a1cf6d18/sYwF2yLh6D.json")
+# --- Load Animations (With Fallback Logic) ---
+# 1. Try to load local files first
+lottie_lock = load_lottie_file("lock.json")
+lottie_success = load_lottie_file("success.json")
+
+# 2. If local files are missing or empty (JSONDecodeError), fallback to URL
+if not lottie_lock:
+    lottie_lock = load_lottieurl("https://lottie.host/5a092c45-24e5-4224-b52e-ec5f97f75355/1oY7x44P9T.json")
+if not lottie_success:
+    lottie_success = load_lottieurl("https://lottie.host/808df04e-e47e-4dcb-947b-1d70a1cf6d18/sYwF2yLh6D.json")
 
 # --- UI Header ---
 col1, col2 = st.columns([1, 4])
@@ -160,21 +179,3 @@ if st.session_state.password:
     )
 else:
     st.info("Configure your parameters in the sidebar and click **Generate Password** to begin.")
-
-def load_lottie_file(filepath: str):
-    """Safely loads a local Lottie JSON file."""
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, filepath)
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return None
-
-# Load from your local computer instead of the internet
-lottie_lock = load_lottie_file("lock.json")
-lottie_success = load_lottie_file("success.json")
-
-lottie_lock = load_lottieurl("https://lottie.host/5a092c45-24e5-4224-b52e-ec5f97f75355/1oY7x44P9T.json")
-lottie_success = load_lottieurl("https://lottie.host/808df04e-e47e-4dcb-947b-1d70a1cf6d18/sYwF2yLh6D.json")
-
